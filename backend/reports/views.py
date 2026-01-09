@@ -8,8 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse
 from django.db.models import Count, Q
 from attendance.models import AttendanceRecord
-from sessions.models import AttendanceSession
-from sessions.permissions import IsTeacher
+from attendance_sessions.models import AttendanceSession
+from attendance_sessions.permissions import IsTeacher
 
 
 class SessionReportView(APIView):

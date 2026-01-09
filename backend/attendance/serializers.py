@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.utils import timezone
 from .models import AttendanceRecord
 from .utils import is_within_geofence
-from sessions.models import AttendanceSession
+from attendance_sessions.models import AttendanceSession
 
 
 class MarkAttendanceSerializer(serializers.Serializer):

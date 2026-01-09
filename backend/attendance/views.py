@@ -12,7 +12,7 @@ from .serializers import (
     AttendanceRecordSerializer,
     StudentAttendanceHistorySerializer
 )
-from sessions.permissions import IsStudent
+from attendance_sessions.permissions import IsStudent
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):

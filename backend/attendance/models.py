@@ -4,7 +4,7 @@ Models for attendance records.
 from django.db import models
 from django.core.exceptions import ValidationError
 from accounts.models import User
-from sessions.models import AttendanceSession
+from attendance_sessions.models import AttendanceSession
 
 
 class AttendanceRecord(models.Model):
