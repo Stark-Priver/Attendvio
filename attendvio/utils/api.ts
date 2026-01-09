@@ -111,22 +111,22 @@ export const sessionAPI = {
     start_time: string;
     end_time: string;
   }) => {
-    const response = await api.post('/sessions/', data);
+    const response = await api.post('/attendance_session/', data);
     return response.data;
   },
 
   getSessions: async () => {
-    const response = await api.get('/sessions/');
+    const response = await api.get('/attendance_session/');
     return response.data;
   },
 
   getActiveSessions: async () => {
-    const response = await api.get('/sessions/active/');
+    const response = await api.get('/attendance_session/active/');
     return response.data;
   },
 
   endSession: async (id: number) => {
-    const response = await api.post(`/sessions/${id}/end_session/`);
+    const response = await api.post(`/attendance_session/${id}/end_session/`);
     return response.data;
   },
 };

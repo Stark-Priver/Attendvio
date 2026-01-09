@@ -1,7 +1,3 @@
-/**
- * Create Session Screen - Teacher Only
- * Form to create new attendance session
- */
 
 import React, { useState } from 'react';
 import {
@@ -24,6 +20,7 @@ import { getCurrentLocation } from '@/utils/location';
 import { Colors, Typography, Spacing } from '@/constants/design';
 
 export default function CreateSessionScreen() {
+  // State declarations
   const [formData, setFormData] = useState({
     subjectName: '',
     radius: '50',
@@ -36,6 +33,67 @@ export default function CreateSessionScreen() {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
+
+  // Handlers
+  const handleCreateSession = async () => {
+    // Validation
+    if (!formData.subjectName.trim()) {
+      setToast({ visible: true, message: 'Please enter subject name', type: 'error' });
+      return;
+    }
+    if (!location) {
+      setToast({ visible: true, message: 'Please capture location', type: 'error' });
+      return;
+    }
+    const radius = parseInt(formData.radius);
+    if (isNaN(radius) || radius < 10 || radius > 1000) {
+      setToast({ visible: true, message: 'Radius must be between 10-1000m', type: 'error' });
+      return;
+    }
+    if (formData.endTime <= formData.startTime) {
+      setToast({ visible: true, message: 'End time must be after start time', type: 'error' });
+      return;
+    }
+    setLoading(true);
+    try {
+      // Round lat/lng to 6 decimals to satisfy backend
+      const roundedLat = Number(location.latitude.toFixed(6));
+      const roundedLng = Number(location.longitude.toFixed(6));
+      await sessionAPI.createSession({
+        subject_name: formData.subjectName.trim(),
+        latitude: roundedLat,
+        longitude: roundedLng,
+        radius: radius,
+        start_time: formData.startTime.toISOString(),
+        end_time: formData.endTime.toISOString(),
+      });
+      setToast({ visible: true, message: 'Session created successfully', type: 'success' });
+      // Reset form
+      setTimeout(() => {
+        setFormData({
+          subjectName: '',
+          radius: '50',
+          startTime: new Date(),
+          endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
+        });
+        setLocation(null);
+      }, 1000);
+    } catch (error: any) {
+      let message = 'Failed to create session';
+      if (error?.response?.data) {
+        if (typeof error.response.data === 'string') {
+          message = error.response.data;
+        } else if (typeof error.response.data === 'object') {
+          message = Object.entries(error.response.data)
+            .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+            .join('\n');
+        }
+      }
+      setToast({ visible: true, message, type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGetLocation = async () => {
     setGettingLocation(true);
@@ -54,91 +112,23 @@ export default function CreateSessionScreen() {
     }
   };
 
-  const handleCreateSession = async () => {
-    // Validation
-    if (!formData.subjectName.trim()) {
-      setToast({ visible: true, message: 'Please enter subject name', type: 'error' });
-      return;
-    }
-
-    if (!location) {
-      setToast({ visible: true, message: 'Please capture location', type: 'error' });
-      return;
-    }
-
-    const radius = parseInt(formData.radius);
-    if (isNaN(radius) || radius < 10 || radius > 1000) {
-      setToast({ visible: true, message: 'Radius must be between 10-1000m', type: 'error' });
-      return;
-    }
-
-    if (formData.endTime <= formData.startTime) {
-      setToast({ visible: true, message: 'End time must be after start time', type: 'error' });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await sessionAPI.createSession({
-        subject_name: formData.subjectName.trim(),
-        latitude: location.latitude,
-        longitude: location.longitude,
-        radius: radius,
-        start_time: formData.startTime.toISOString(),
-        end_time: formData.endTime.toISOString(),
-      });
-
-      setToast({ visible: true, message: 'Session created successfully', type: 'success' });
-      
-      // Reset form
-      setTimeout(() => {
-        setFormData({
-          subjectName: '',
-          radius: '50',
-          startTime: new Date(),
-          endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
-        });
-        setLocation(null);
-      }, 1000);
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to create session';
-      setToast({ visible: true, message, type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}>
-        
-        {/* Header */}
-        <Animated.View entering={FadeInDown.delay(100).duration(400)}>
-          <Text style={styles.title}>New Session</Text>
-          <Text style={styles.subtitle}>
-            Create an attendance session with geofencing
-          </Text>
-        </Animated.View>
-
-        {/* Form */}
-        <Animated.View
-          entering={FadeInDown.delay(150).duration(400)}
-          style={styles.form}>
-          
-          <Input
-            label="Subject Name"
-            placeholder="e.g., Mobile App Development"
-            value={formData.subjectName}
-            onChangeText={(text) => setFormData({ ...formData, subjectName: text })}
-          />
-
-          {/* Location */}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      enabled
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Animated.View entering={FadeInDown.duration(400)} style={styles.formCard}>
           <View>
+            <Input
+              label="Subject Name"
+              placeholder="e.g., Mobile App Development"
+              value={formData.subjectName}
+              onChangeText={(text) => setFormData({ ...formData, subjectName: text })}
+            />
+
+            {/* Location */}
             <Text style={styles.label}>Session Location</Text>
             {location ? (
               <Card style={styles.locationCard}>
@@ -176,71 +166,72 @@ export default function CreateSessionScreen() {
                 />
               </Card>
             )}
-          </View>
 
-          <Input
-            label="Radius (meters)"
-            placeholder="50"
-            value={formData.radius}
-            onChangeText={(text) => setFormData({ ...formData, radius: text })}
-            keyboardType="numeric"
-          />
-
-          {/* Time Selection */}
-          <View>
-            <Text style={styles.label}>Start Time</Text>
-            <Button
-              title={formData.startTime.toLocaleString([], {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-              onPress={() => setShowStartPicker(true)}
-              variant="secondary"
+            <Input
+              label="Radius (meters)"
+              placeholder="50"
+              value={formData.radius}
+              onChangeText={(text) => setFormData({ ...formData, radius: text })}
+              keyboardType="numeric"
             />
-            {showStartPicker && (
-              <DateTimePicker
-                value={formData.startTime}
-                mode="datetime"
-                onChange={(event, date) => {
-                  setShowStartPicker(false);
-                  if (date) setFormData({ ...formData, startTime: date });
-                }}
+
+            {/* Time Selection */}
+            <View>
+              <View>
+                <Text style={styles.label}>Start Time</Text>
+                <Button
+                  title={formData.startTime.toLocaleString([], {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                  onPress={() => setShowStartPicker(true)}
+                  variant="secondary"
+                />
+                {showStartPicker && (
+                  <DateTimePicker
+                    value={formData.startTime}
+                    mode="datetime"
+                    onChange={(event, date) => {
+                      setShowStartPicker(false);
+                      if (date) setFormData({ ...formData, startTime: date });
+                    }}
+                  />
+                )}
+              </View>
+              <View>
+                <Text style={styles.label}>End Time</Text>
+                <Button
+                  title={formData.endTime.toLocaleString([], {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                  onPress={() => setShowEndPicker(true)}
+                  variant="secondary"
+                />
+                {showEndPicker && (
+                  <DateTimePicker
+                    value={formData.endTime}
+                    mode="datetime"
+                    onChange={(event, date) => {
+                      setShowEndPicker(false);
+                      if (date) setFormData({ ...formData, endTime: date });
+                    }}
+                  />
+                )}
+              </View>
+            </View>
+
+            <View style={styles.createButtonContainer}>
+              <Button
+                title="Create Session"
+                onPress={handleCreateSession}
+                loading={loading}
               />
-            )}
-          </View>
-
-          <View>
-            <Text style={styles.label}>End Time</Text>
-            <Button
-              title={formData.endTime.toLocaleString([], {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-              onPress={() => setShowEndPicker(true)}
-              variant="secondary"
-            />
-            {showEndPicker && (
-              <DateTimePicker
-                value={formData.endTime}
-                mode="datetime"
-                onChange={(event, date) => {
-                  setShowEndPicker(false);
-                  if (date) setFormData({ ...formData, endTime: date });
-                }}
-              />
-            )}
-          </View>
-
-          <View style={styles.createButtonContainer}>
-            <Button
-              title="Create Session"
-              onPress={handleCreateSession}
-              loading={loading}
-            />
+            </View>
           </View>
         </Animated.View>
       </ScrollView>
@@ -256,6 +247,24 @@ export default function CreateSessionScreen() {
 }
 
 const styles = StyleSheet.create({
+      header: {
+        fontSize: Typography.fontSize.largeTitle,
+        fontWeight: Typography.fontWeight.bold,
+        color: Colors.darkBlue,
+        marginBottom: Spacing.lg,
+        textAlign: 'center',
+      },
+    formCard: {
+      backgroundColor: Colors.white,
+      borderRadius: 16,
+      padding: Spacing.lg,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      elevation: 2,
+      marginBottom: Spacing.xl,
+    },
   container: {
     flex: 1,
     backgroundColor: Colors.white,
