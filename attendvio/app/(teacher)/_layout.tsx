@@ -50,7 +50,7 @@ export default function TeacherLayout() {
       <Tabs.Screen
         name="create"
         options={{
-          title: 'Create Lesson/Session',
+          title: 'Add  Session',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle" size={size} color={color} />
           ),
