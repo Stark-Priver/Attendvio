@@ -3,13 +3,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
   RefreshControl,
   Alert,
+  Text,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,8 +18,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Toast } from '@/components/ui/toast';
-import { sessionAPI } from '@/utils/api';
+import { sessionAPI, authAPI } from '@/utils/api';
 import { Colors, Typography, Spacing } from '@/constants/design';
+
 
 interface Session {
   id: number;
@@ -36,6 +38,7 @@ export default function TeacherHomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [endingSession, setEndingSession] = useState<number | null>(null);
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const loadSessions = async (isRefresh = false) => {
     try {
@@ -52,9 +55,23 @@ export default function TeacherHomeScreen() {
     }
   };
 
+
+  // Load sessions on initial mount
   useEffect(() => {
     loadSessions();
+    // Also fetch current user for debug
+    (async () => {
+      const user = await authAPI.getCurrentUser();
+      setCurrentUser(user);
+    })();
   }, []);
+
+  // Reload sessions every time the tab is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      loadSessions();
+    }, [])
+  );
 
   const handleEndSession = (session: Session) => {
     Alert.alert(
@@ -82,72 +99,48 @@ export default function TeacherHomeScreen() {
     );
   };
 
-  const getStatusColor = (status: string) => {
-    if (status === 'ACTIVE') return Colors.success;
-    if (status === 'SCHEDULED') return Colors.orange;
-    return Colors.textTertiary;
-  };
-
-  const getStatusIcon = (status: string) => {
-    if (status === 'ACTIVE') return 'radio-button-on';
-    if (status === 'SCHEDULED') return 'time';
-    return 'checkmark-circle';
-  };
-
-  const renderSession = ({ item, index }: { item: Session; index: number }) => {
-    const startTime = new Date(item.start_time);
-    // const endTime = new Date(item.end_time); // Not used
-    const statusColor = getStatusColor(item.status);
-
-    return (
-      <Animated.View entering={FadeInDown.delay(index * 50).duration(400)}>
-        <Card style={styles.sessionCard}>
-          <View style={styles.sessionHeader}>
-            <View style={[styles.iconContainer, { backgroundColor: statusColor + '15' }]}>
-              <Ionicons name={getStatusIcon(item.status)} size={24} color={statusColor} />
-            </View>
-            <View style={styles.sessionInfo}>
-              <Text style={styles.sessionTitle}>{item.subject_name}</Text>
-              <Text style={styles.sessionStatus}>{item.status}</Text>
-            </View>
-            {item.attendance_count !== undefined && (
-              <View style={styles.countBadge}>
-                <Ionicons name="people" size={16} color={Colors.darkBlue} />
-                <Text style={styles.countText}>{item.attendance_count}</Text>
-              </View>
-            )}
+  // Render a single session card
+  const renderSession = ({ item }: { item: Session }) => (
+    <Animated.View entering={FadeInDown}>
+      <Card style={styles.sessionCard}>
+        <View style={styles.sessionHeader}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="book-outline" size={32} color={Colors.darkBlue} />
           </View>
-
-          <View style={styles.sessionDetails}>
-            <View style={styles.detailRow}>
-              <Ionicons name="time-outline" size={18} color={Colors.textSecondary} />
-              <Text style={styles.detailText}>
-                {startTime.toLocaleString([], {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Ionicons name="location-outline" size={18} color={Colors.textSecondary} />
-              <Text style={styles.detailText}>{item.radius}m radius</Text>
-            </View>
+          <View style={styles.sessionInfo}>
+            <Text style={styles.sessionTitle}>{item.subject_name}</Text>
+            <Text style={styles.sessionStatus}>{item.status}</Text>
           </View>
-
-          {item.status === 'ACTIVE' && (
-            <Button
-              title={endingSession === item.id ? 'Ending...' : 'End Session'}
-              onPress={() => handleEndSession(item)}
-              variant="danger"
-              loading={endingSession === item.id}
-            />
+          {typeof item.attendance_count === 'number' && (
+            <View style={styles.countBadge}>
+              <Ionicons name="person-outline" size={16} color={Colors.darkBlue} />
+              <Text style={styles.countText}>{item.attendance_count}</Text>
+            </View>
           )}
-        </Card>
-      </Animated.View>
-    );
-  };
+        </View>
+        <View style={styles.sessionDetails}>
+          <View style={styles.detailRow}>
+            <Ionicons name="time-outline" size={16} color={Colors.textSecondary} />
+            <Text style={styles.detailText}>
+              {new Date(item.start_time).toLocaleString()} - {new Date(item.end_time).toLocaleString()}
+            </Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Ionicons name="location-outline" size={16} color={Colors.textSecondary} />
+            <Text style={styles.detailText}>Radius: {item.radius}m</Text>
+          </View>
+        </View>
+        {item.status !== 'ended' && (
+          <Button
+            title={endingSession === item.id ? 'Ending...' : 'End Session'}
+            onPress={() => handleEndSession(item)}
+            variant="danger"
+            loading={endingSession === item.id}
+          />
+        )}
+      </Card>
+    </Animated.View>
+  );
 
   if (loading) {
     return <LoadingSpinner message="Loading sessions..." />;
