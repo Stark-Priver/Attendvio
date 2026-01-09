@@ -9,7 +9,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  withDelay,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, ZIndex } from '@/constants/design';
@@ -42,7 +41,7 @@ export const Toast: React.FC<ToastProps> = ({
         setTimeout(onHide, 300);
       }, 3000);
     }
-  }, [visible]);
+    }, [visible, onHide, opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

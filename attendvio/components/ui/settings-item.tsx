@@ -32,14 +32,14 @@ export const SettingsItem: React.FC<SettingsItemProps> = ({
   showChevron = true,
   destructive = false,
 }) => {
-  const backgroundColor = useSharedValue(Colors.white);
+  const backgroundColor = useSharedValue<string>(Colors.white);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: backgroundColor.value,
+    backgroundColor: backgroundColor.value as string,
   }));
 
   const handlePressIn = () => {
-    backgroundColor.value = withTiming(Colors.lightGray, { duration: 100 });
+    backgroundColor.value = withTiming(Colors.backgroundSecondary, { duration: 100 });
   };
 
   const handlePressOut = () => {

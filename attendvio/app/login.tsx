@@ -27,7 +27,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'info' as const });
+  const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -41,9 +41,9 @@ export default function LoginScreen() {
       
       // Navigate based on role
       if (response.user.role === 'TEACHER') {
-        router.replace('/(teacher)');
+        router.replace({ pathname: '/(teacher)' });
       } else {
-        router.replace('/(student)');
+        router.replace({ pathname: '/(student)' });
       }
     } catch (error: any) {
       const message = error.response?.data?.error || 'Login failed. Please try again.';
@@ -113,7 +113,7 @@ export default function LoginScreen() {
           />
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Text style={styles.footerText}>Don&apos;t have an account? </Text>
             <Pressable onPress={() => router.push('/register')}>
               <Text style={styles.link}>Sign Up</Text>
             </Pressable>

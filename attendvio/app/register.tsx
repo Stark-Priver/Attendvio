@@ -37,7 +37,7 @@ export default function RegisterScreen() {
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'info' as const });
+  const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
 
   const handleRegister = async () => {
     // Validation
@@ -76,9 +76,9 @@ export default function RegisterScreen() {
 
       // Navigate based on role
       if (response.user.role === 'TEACHER') {
-        router.replace('/(teacher)');
+        router.replace({ pathname: '/(teacher)' as any });
       } else {
-        router.replace('/(student)');
+        router.replace({ pathname: '/(student)' as any });
       }
     } catch (error: any) {
       const message = error.response?.data?.error || 'Registration failed. Please try again.';

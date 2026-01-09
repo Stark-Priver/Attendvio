@@ -16,7 +16,7 @@ export const useFadeIn = (duration = Animation.duration.normal) => {
       duration,
       easing: Easing.out(Easing.cubic),
     });
-  }, []);
+  }, [duration, opacity]);
 
   return opacity;
 };
@@ -35,7 +35,7 @@ export const useSlideIn = (duration = Animation.duration.normal) => {
       duration,
       easing: Easing.out(Easing.cubic),
     });
-  }, []);
+  }, [duration, translateY, opacity]);
 
   return { translateY, opacity };
 };
@@ -50,20 +50,22 @@ export const useScale = (pressed: boolean) => {
       stiffness: Animation.spring.stiffness,
       mass: Animation.spring.mass,
     });
-  }, [pressed]);
+  }, [pressed, scale]);
 
   return scale;
 };
 
 // Success animation (subtle scale + fade)
-export const successAnimation = () => {
+export const useSuccessAnimation = () => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
-  scale.value = withSequence(
-    withTiming(1.05, { duration: 150 }),
-    withTiming(1, { duration: 150 })
-  );
+  useEffect(() => {
+    scale.value = withSequence(
+      withTiming(1.05, { duration: 150 }),
+      withTiming(1, { duration: 150 })
+    );
+  }, [scale]);
 
   return { scale, opacity };
 };
@@ -84,7 +86,7 @@ export const usePulse = () => {
     animate();
 
     return () => clearInterval(interval);
-  }, []);
+  }, [opacity]);
 
   return opacity;
 };
@@ -107,22 +109,24 @@ export const useStaggeredAnimation = (index: number, delay = 50) => {
         easing: Easing.out(Easing.cubic),
       });
     }, animationDelay);
-  }, [index]);
+  }, [index, delay, opacity, translateY]);
 
   return { opacity, translateY };
 };
 
 // Shake animation (for errors)
-export const shakeAnimation = () => {
+export const useShakeAnimation = () => {
   const translateX = useSharedValue(0);
 
-  translateX.value = withSequence(
-    withTiming(-10, { duration: 50 }),
-    withTiming(10, { duration: 50 }),
-    withTiming(-10, { duration: 50 }),
-    withTiming(10, { duration: 50 }),
-    withTiming(0, { duration: 50 })
-  );
+  useEffect(() => {
+    translateX.value = withSequence(
+      withTiming(-10, { duration: 50 }),
+      withTiming(10, { duration: 50 }),
+      withTiming(-10, { duration: 50 }),
+      withTiming(10, { duration: 50 }),
+      withTiming(0, { duration: 50 })
+    );
+  }, [translateX]);
 
   return translateX;
 };

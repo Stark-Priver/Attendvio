@@ -35,7 +35,7 @@ export default function TeacherHomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [endingSession, setEndingSession] = useState<number | null>(null);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'info' as const });
+  const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
 
   const loadSessions = async (isRefresh = false) => {
     try {
@@ -44,7 +44,7 @@ export default function TeacherHomeScreen() {
 
       const response = await sessionAPI.getSessions();
       setSessions(response);
-    } catch (error) {
+    } catch {
       setToast({ visible: true, message: 'Failed to load sessions', type: 'error' });
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function TeacherHomeScreen() {
               await sessionAPI.endSession(session.id);
               setToast({ visible: true, message: 'Session ended successfully', type: 'success' });
               loadSessions();
-            } catch (error) {
+            } catch {
               setToast({ visible: true, message: 'Failed to end session', type: 'error' });
             } finally {
               setEndingSession(null);
@@ -96,7 +96,7 @@ export default function TeacherHomeScreen() {
 
   const renderSession = ({ item, index }: { item: Session; index: number }) => {
     const startTime = new Date(item.start_time);
-    const endTime = new Date(item.end_time);
+    // const endTime = new Date(item.end_time); // Not used
     const statusColor = getStatusColor(item.status);
 
     return (

@@ -4,9 +4,10 @@
 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { APP_CONFIG } from '@/constants/config';
 
-// Base URL - adjust for your environment
-const BASE_URL = 'http://localhost:8000/api';
+// Base URL
+const BASE_URL = APP_CONFIG.API_BASE_URL;
 
 // Storage keys
 const TOKEN_KEY = '@attendvio_access_token';

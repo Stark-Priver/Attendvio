@@ -3,18 +3,17 @@
  * Shows geofence-enabled attendance sessions
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   RefreshControl,
-  Pressable,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+// import { router } from 'expo-router';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -40,7 +39,7 @@ export default function StudentHomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [markingAttendance, setMarkingAttendance] = useState<number | null>(null);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'info' as const });
+  const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
 
   const loadSessions = async (isRefresh = false) => {
     try {
@@ -49,7 +48,7 @@ export default function StudentHomeScreen() {
 
       const response = await sessionAPI.getActiveSessions();
       setSessions(response);
-    } catch (error) {
+    } catch {
       setToast({ visible: true, message: 'Failed to load sessions', type: 'error' });
     } finally {
       setLoading(false);
@@ -109,7 +108,7 @@ export default function StudentHomeScreen() {
 
   const renderSession = ({ item, index }: { item: Session; index: number }) => {
     const startTime = new Date(item.start_time);
-    const endTime = new Date(item.end_time);
+    const endTime = new Date(item.end_time); // Used for display only
 
     return (
       <Animated.View entering={FadeInDown.delay(index * 50).duration(400)}>
