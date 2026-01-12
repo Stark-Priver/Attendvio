@@ -9,7 +9,6 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
-  Alert,
   Share,
   Modal,
   ScrollView,

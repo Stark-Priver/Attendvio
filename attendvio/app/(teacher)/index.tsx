@@ -3,13 +3,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect, router } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import {
   View,
   StyleSheet,
   FlatList,
   RefreshControl,
-  Alert,
+  Alert as RNAlert,
   Text,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -18,7 +18,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Toast } from '@/components/ui/toast';
-import { sessionAPI, authAPI } from '@/utils/api';
+import { sessionAPI } from '@/utils/api';
 import { Colors, Typography, Spacing } from '@/constants/design';
 
 
@@ -33,12 +33,12 @@ interface Session {
 }
 
 export default function TeacherHomeScreen() {
+  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [endingSession, setEndingSession] = useState<number | null>(null);
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
-  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const loadSessions = async (isRefresh = false) => {
     try {
@@ -59,11 +59,6 @@ export default function TeacherHomeScreen() {
   // Load sessions on initial mount
   useEffect(() => {
     loadSessions();
-    // Also fetch current user for debug
-    (async () => {
-      const user = await authAPI.getCurrentUser();
-      setCurrentUser(user);
-    })();
   }, []);
 
   // Reload sessions every time the tab is focused
@@ -74,7 +69,7 @@ export default function TeacherHomeScreen() {
   );
 
   const handleEndSession = (session: Session) => {
-    Alert.alert(
+    RNAlert.alert(
       'End Session',
       `Are you sure you want to end "${session.subject_name}"?`,
       [
@@ -174,7 +169,7 @@ export default function TeacherHomeScreen() {
             <View style={styles.footerButton}>
               <Button
                 title="Create New Session"
-                onPress={() => router.push('/(teacher)/session')}
+                onPress={() => router.push('./session')}
               />
             </View>
           ) : null
@@ -185,7 +180,7 @@ export default function TeacherHomeScreen() {
         <View style={styles.floatingButton}>
           <Button
             title="Create Session"
-            onPress={() => router.push('/(teacher)/session')}
+            onPress={() => router.push('./session')}
           />
         </View>
       )}
