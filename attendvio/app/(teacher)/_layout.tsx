@@ -65,6 +65,13 @@ export default function TeacherLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="session"
+        options={{
+          href: null,
+          title: 'Create Session',
+        }}
+      />
     </Tabs>
   );
 }

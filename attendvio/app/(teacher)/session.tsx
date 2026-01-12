@@ -8,17 +8,16 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { router } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Toast } from '@/components/ui/toast';
+import CustomDateTimePicker from '@/components/ui/custom-date-time-picker';
 import { sessionAPI } from '@/utils/api';
 import { getCurrentLocation } from '@/utils/location';
 import { Colors, Typography, Spacing } from '@/constants/design';
@@ -33,8 +32,6 @@ export default function TeacherSessionScreen() {
 
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
 
   useEffect(() => {
@@ -50,24 +47,6 @@ export default function TeacherSessionScreen() {
       }
     })();
   }, []);
-
-  const handleStartTimeChange = (event: any, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowStartPicker(false);
-    }
-    if (selectedDate) {
-      setFormData({ ...formData, start_time: selectedDate });
-    }
-  };
-
-  const handleEndTimeChange = (event: any, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowEndPicker(false);
-    }
-    if (selectedDate) {
-      setFormData({ ...formData, end_time: selectedDate });
-    }
-  };
 
   const handleCreateSession = async () => {
     // Validation
@@ -155,37 +134,21 @@ export default function TeacherSessionScreen() {
           <Text style={styles.sectionTitle}>Session Timing</Text>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Start Time *</Text>
-            <Button
-              title={formData.start_time.toLocaleString()}
-              onPress={() => setShowStartPicker(true)}
-              variant="secondary"
+            <CustomDateTimePicker
+              value={formData.start_time}
+              onChange={(date) => setFormData({ ...formData, start_time: date })}
+              mode="datetime"
+              label="Start Time *"
             />
-            {showStartPicker && (
-              <DateTimePicker
-                value={formData.start_time}
-                mode="datetime"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleStartTimeChange}
-              />
-            )}
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>End Time *</Text>
-            <Button
-              title={formData.end_time.toLocaleString()}
-              onPress={() => setShowEndPicker(true)}
-              variant="secondary"
+            <CustomDateTimePicker
+              value={formData.end_time}
+              onChange={(date) => setFormData({ ...formData, end_time: date })}
+              mode="datetime"
+              label="End Time *"
             />
-            {showEndPicker && (
-              <DateTimePicker
-                value={formData.end_time}
-                mode="datetime"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleEndTimeChange}
-              />
-            )}
           </View>
         </Card>
 
