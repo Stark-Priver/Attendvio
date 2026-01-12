@@ -3,7 +3,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
+import { Link } from 'expo-router';
 import {
   View,
   StyleSheet,
@@ -33,7 +34,6 @@ interface Session {
 }
 
 export default function TeacherHomeScreen() {
-  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -143,6 +143,12 @@ export default function TeacherHomeScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerButton}>
+        <Link href="./session" asChild>
+          <Button title="+ Create Session" />
+        </Link>
+      </View>
+      
       <FlatList
         data={sessions}
         renderItem={renderSession}
@@ -164,26 +170,7 @@ export default function TeacherHomeScreen() {
             </Text>
           </View>
         }
-        ListFooterComponent={
-          sessions.length > 0 ? (
-            <View style={styles.footerButton}>
-              <Button
-                title="Create New Session"
-                onPress={() => router.push('./session')}
-              />
-            </View>
-          ) : null
-        }
       />
-
-      {sessions.length === 0 && (
-        <View style={styles.floatingButton}>
-          <Button
-            title="Create Session"
-            onPress={() => router.push('./session')}
-          />
-        </View>
-      )}
 
       <Toast
         visible={toast.visible}
@@ -199,6 +186,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.lightGray,
+  },
+  headerButton: {
+    padding: Spacing.screenHorizontal,
+    paddingTop: Spacing.base,
+    paddingBottom: Spacing.sm,
   },
   listContent: {
     padding: Spacing.screenHorizontal,

@@ -1,5 +1,5 @@
 /**
- * Teacher Layout - Tab Navigation with Session Screen
+ * Teacher Layout - Tab Navigation
  */
 
 import React from 'react';
@@ -63,13 +63,6 @@ export default function TeacherLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="session"
-        options={{
-          href: null,
-          title: 'Create Session',
         }}
       />
     </Tabs>
