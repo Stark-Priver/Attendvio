@@ -3,8 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect } from 'expo-router';
-import { Link } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import {
   View,
   StyleSheet,
@@ -34,6 +33,7 @@ interface Session {
 }
 
 export default function TeacherHomeScreen() {
+  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -144,9 +144,10 @@ export default function TeacherHomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.headerButton}>
-        <Link href="./session" asChild>
-          <Button title="+ Create Session" />
-        </Link>
+        <Button 
+          title="+ Create Session" 
+          onPress={() => router.push('./session')}
+        />
       </View>
       
       <FlatList
