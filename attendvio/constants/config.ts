@@ -3,11 +3,14 @@
  * Central configuration for the app
  */
 
+// Toggle this flag to switch between local and production API
+export const USE_LOCAL_API = false; // Set to true for local development
+
 export const APP_CONFIG = {
   // API Configuration
-  API_BASE_URL: __DEV__ 
-    ? 'http://10.0.2.2:8000/api'  // Android emulator
-    : 'https://your-production-url.com/api',
+  API_BASE_URL: USE_LOCAL_API
+    ? 'http://10.0.2.2:8000/api' // Android emulator local
+    : 'https://vio.umemeswahili.co.tz/api',
   
   // App Information
   APP_NAME: 'Attendvio',

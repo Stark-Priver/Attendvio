@@ -15,6 +15,8 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 if '10.0.2.2' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('10.0.2.2')
+if 'vio.umemeswahili.co.tz' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('vio.umemeswahili.co.tz')
 
 # Application definition
 INSTALLED_APPS = [
