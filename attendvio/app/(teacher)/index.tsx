@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, router } from 'expo-router';
 import {
   View,
   StyleSheet,
@@ -169,7 +169,26 @@ export default function TeacherHomeScreen() {
             </Text>
           </View>
         }
+        ListFooterComponent={
+          sessions.length > 0 ? (
+            <View style={styles.footerButton}>
+              <Button
+                title="Create New Session"
+                onPress={() => router.push('/(teacher)/session')}
+              />
+            </View>
+          ) : null
+        }
       />
+
+      {sessions.length === 0 && (
+        <View style={styles.floatingButton}>
+          <Button
+            title="Create Session"
+            onPress={() => router.push('/(teacher)/session')}
+          />
+        </View>
+      )}
 
       <Toast
         visible={toast.visible}
@@ -263,5 +282,15 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: Spacing.xxxl,
+  },
+  footerButton: {
+    padding: Spacing.screenHorizontal,
+    paddingVertical: Spacing.base,
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: Spacing.xxxl,
+    left: Spacing.screenHorizontal,
+    right: Spacing.screenHorizontal,
   },
 });

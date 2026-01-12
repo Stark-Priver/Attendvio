@@ -148,6 +148,31 @@ export const attendanceAPI = {
   },
 };
 
+// Reports methods
+export const reportsAPI = {
+  getSessionReport: async (sessionId: number) => {
+    const response = await api.get(`/reports/session/${sessionId}/`);
+    return response.data;
+  },
+
+  exportSessionCSV: async (sessionId: number) => {
+    const response = await api.get(`/reports/session/${sessionId}/export/`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
+  getTeacherDashboard: async () => {
+    const response = await api.get('/reports/teacher/dashboard/');
+    return response.data;
+  },
+
+  getStudentDashboard: async () => {
+    const response = await api.get('/reports/student/dashboard/');
+    return response.data;
+  },
+};
+
 // Storage helpers
 const saveAuth = async (tokens: { access: string; refresh: string }, user: any) => {
   await AsyncStorage.setItem(TOKEN_KEY, tokens.access);

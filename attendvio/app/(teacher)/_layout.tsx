@@ -48,11 +48,11 @@ export default function TeacherLayout() {
         }}
       />
       <Tabs.Screen
-        name="create"
+        name="reports"
         options={{
-          title: 'Add  Session',
+          title: 'Reports',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add-circle" size={size} color={color} />
+            <Ionicons name="document-text" size={size} color={color} />
           ),
         }}
       />

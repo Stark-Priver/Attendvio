@@ -10,14 +10,24 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
+  Modal,
 } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { 
+  FadeInDown, 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  withSequence,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 // import { router } from 'expo-router';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Toast } from '@/components/ui/toast';
+import CheckInSuccessAnimation from '@/components/ui/check-in-success';
 import { sessionAPI, attendanceAPI } from '@/utils/api';
 import { getCurrentLocation, isWithinGeofence } from '@/utils/location';
 import { Colors, Typography, Spacing } from '@/constants/design';
@@ -39,6 +49,7 @@ export default function StudentHomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [markingAttendance, setMarkingAttendance] = useState<number | null>(null);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'info' }>({ visible: false, message: '', type: 'info' });
 
   const loadSessions = async (isRefresh = false) => {
