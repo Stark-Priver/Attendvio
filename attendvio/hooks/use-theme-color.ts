@@ -1,3 +1,7 @@
+// Added for commit 7
+export function usePrimaryColor(): string {
+  return '#3366FF';
+}
 /**
  * Learn more about light and dark modes:
  * https://docs.expo.dev/guides/color-schemes/

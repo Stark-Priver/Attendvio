@@ -1,3 +1,7 @@
+// Added for commit 5
+export function isApiUrl(url: string): boolean {
+  return url.startsWith('http://') || url.startsWith('https://');
+}
 /**
  * API client for Attendvio backend
  */

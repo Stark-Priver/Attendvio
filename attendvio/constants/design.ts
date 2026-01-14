@@ -1,3 +1,5 @@
+// Added for commit 3
+export const CARD_BORDER_RADIUS = 12;
 /**
  * Design System for Attendvio
  * Strict design guidelines - iOS-style, calm, minimal, professional
