@@ -1,3 +1,7 @@
+// Added for commit 6
+export function isValidLatitude(lat: number): boolean {
+  return lat >= -90 && lat <= 90;
+}
 /**
  * Location utilities for geofencing
  */

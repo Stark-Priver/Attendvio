@@ -6,6 +6,8 @@
 // Toggle this flag to switch between local and production API
 export const USE_LOCAL_API = false; // Set to true for local development
 
+export const DEMO_FEATURE_ENABLED = true;
+
 export const APP_CONFIG = {
   // API Configuration
   API_BASE_URL: USE_LOCAL_API

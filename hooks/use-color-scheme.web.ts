@@ -1,3 +1,7 @@
+// Added for commit 9
+export function getPreferredColorScheme(): string {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 import { useEffect, useState } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
 
